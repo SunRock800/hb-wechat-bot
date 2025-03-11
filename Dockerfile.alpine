@@ -42,5 +42,4 @@ RUN npm config set registry ${NPM_REGISTRY} && npm i
 COPY *.js ./
 COPY src/ ./src/
 
-CMD ["node", "node_modules/puppeteer/install.js"]
 CMD ["npm", "run", "dev"]
