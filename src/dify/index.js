@@ -18,7 +18,7 @@ function setConfig(prompt) {
     data: JSON.stringify({
       inputs: {},
       query: prompt,
-      response_mode: 'blocking',
+      response_mode: 'streaming',
       user: bot_name,
       files: [],
     }),

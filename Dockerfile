@@ -1,10 +1,9 @@
 ARG APT_SOURCE="default"
 
-FROM node:19 as builder-default
+FROM node:19 AS builder-default
 ENV NPM_REGISTRY="https://registry.npmjs.org"
 
-FROM node:19 as builder-aliyun
-
+FROM node:19 AS builder-aliyun
 ENV NPM_REGISTRY="https://registry.npmmirror.com"
 RUN sed -i s/deb.debian.org/mirrors.aliyun.com/g /etc/apt/sources.list \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
@@ -43,8 +42,8 @@ RUN apt-get update \
 
 FROM builder
 
-ENV CHROME_BIN="/usr/bin/chromium" \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
+# ENV CHROME_BIN="/usr/bin/chromium" \
+#    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
 
 RUN mkdir -p /app
 WORKDIR /app
@@ -54,5 +53,6 @@ RUN npm config set registry ${NPM_REGISTRY} && npm i
 
 COPY *.js ./
 COPY src/ ./src/
+COPY .env ./
 
 CMD ["npm", "run", "dev"]
