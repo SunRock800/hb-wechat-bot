@@ -18,9 +18,10 @@ function setConfig(prompt) {
   return {
     method: 'post',
     url: `${url}/${action}`,
+    timeout: 120000,
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
+      // Accept: 'application/json',
       Authorization: `Bearer ${token}`,
     },
     data: JSON.stringify({
@@ -37,9 +38,24 @@ export async function getDifyReply(prompt) {
   try {
     const config = setConfig(prompt)
     console.log('🌸🌸🌸 / config: ', config)
-    const response = await axios(config)
-    console.log('🌸🌸🌸 / response: ', response)
-    return response
+    const res = await axios.post(config)
+    let result = ''
+    const lines = res.data.split('\n').filter((line) => line.trim() !== '')
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const messageObj = line.substring(6)
+        if (messageObj === '[DONE]') break
+        const message = JSON.parse(messageObj)
+        if (message.choices && message.choices[0].delta && message.choices[0].delta.content) {
+          result += message.choices[0].delta.content
+        }
+      }
+    }
+    return result
+
+    // const response = await axios(config)
+    // console.log('🌸🌸🌸 / response: ', response)
+    // return response
   } catch (error) {
     console.error(error.code)
     console.error(error.message)
