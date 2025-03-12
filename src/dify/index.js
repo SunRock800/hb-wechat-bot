@@ -6,10 +6,18 @@ const env = dotenv.config().parsed // 环境参数
 const token = env.DIFY_API_KEY
 const url = env.DIFY_URL
 const bot_name = env.BOT_NAME
+const actions = {
+  chat: 'chat-messages',
+  work: 'workflow/run',
+}
+function getAction() {
+  return actions[env.DIFY_ACTION]
+}
 function setConfig(prompt) {
+  const action = getAction()
   return {
     method: 'post',
-    url: `${url}/chat-messages`,
+    url: `${url}/${action}`,
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',

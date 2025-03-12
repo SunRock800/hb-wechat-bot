@@ -56,8 +56,8 @@ export async function defaultMessage(msg, bot, ServiceType = 'GPT') {
     if (!room && content.trimStart().startsWith(`${autoReplyPrefix}`)) {
       const question = content.replace(`${autoReplyPrefix}`, '')
       console.log('🌸🌸🌸 / content: ', question)
-      const response = await getReply(question)
-      await contact.say(response)
+      // const response = await getReply(question)
+      // await contact.say(response)
     }
   } catch (e) {
     console.error(e)

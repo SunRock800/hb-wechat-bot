@@ -52,7 +52,7 @@ COPY package.json ./
 RUN npm config set registry ${NPM_REGISTRY} && npm i
 
 COPY *.js ./
-# COPY src/ ./src/
+COPY src/ ./src/
 COPY .env ./
 
-# CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev"]

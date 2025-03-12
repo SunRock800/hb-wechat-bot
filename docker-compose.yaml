@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+
+  wechat-bot:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: wechat-bot
+#    restart: always
+    volumes:
+      - .env:/app/.env
+      - ./src/:/app/src/
+    command: ['ls','-a']
