@@ -40,7 +40,7 @@ export async function defaultMessage(msg, bot, ServiceType = 'GPT') {
   const isBotSelf = botName === `@${remarkName}` || botName === `@${name}` // 是否是机器人自己
   const isBotSelfDebug = content.trimStart().startsWith('你是谁') // 是否是机器人自己的调试消息
   // TODO 你们可以根据自己的需求修改这里的逻辑
-  if ((isBotSelf && !isBotSelfDebug) || !isText) return // 如果是机器人自己发送的消息或者消息类型不是文本则不处理
+  // if ((isBotSelf && !isBotSelfDebug) || !isText) return // 如果是机器人自己发送的消息或者消息类型不是文本则不处理
   try {
     // 区分群聊和私聊
     // 群聊消息去掉艾特主体后，匹配自动回复前缀
@@ -56,8 +56,9 @@ export async function defaultMessage(msg, bot, ServiceType = 'GPT') {
     if (!room && content.trimStart().startsWith(`${autoReplyPrefix}`)) {
       const question = content.replace(`${autoReplyPrefix}`, '')
       console.log('🌸🌸🌸 / content: ', question)
-      // const response = await getReply(question)
-      // await contact.say(response)
+      console.log('🌸🌸🌸 / isBotSelf: ', isBotSelf)
+      const response = await getReply(question)
+      await contact.say(response)
     }
   } catch (e) {
     console.error(e)

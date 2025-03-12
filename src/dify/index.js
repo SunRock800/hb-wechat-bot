@@ -39,7 +39,7 @@ export async function getDifyReply(prompt) {
     console.log('🌸🌸🌸 / config: ', config)
     const response = await axios(config)
     console.log('🌸🌸🌸 / response: ', response)
-    return response.data.answer
+    return response
   } catch (error) {
     console.error(error.code)
     console.error(error.message)
