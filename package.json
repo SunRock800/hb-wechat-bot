@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node ./cli.js",
+    "dev": "node ./src/index.js",
     "format": "prettier --write ./src",
-    "start": "node ./cli.js",
+    "start": "node ./src/index.js",
     "test": "node ./src/wechaty/testMessage.js",
     "test-openai": "node ./src/openai/__test__.js",
     "test-xunfei": "node ./src/xunfei/__test__.js",
@@ -42,6 +42,7 @@
     "wechaty": "^1.20.2",
     "wechaty-puppet-wechat": "^1.18.4",
     "wechaty-puppet-wechat4u": "^1.14.14",
+    "wechaty-puppet-whatsapp": "^1.19.16",
     "ws": "^8.16.0"
   },
   "devDependencies": {

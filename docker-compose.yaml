@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+
+  wechat-bot:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: wechat-bot
+#    restart: always
+    volumes:
+      - ./entrypoint.sh:/app/entrypoint.sh
+      - ./.env:/app/.env
+      - ./package.json:/app/package.json
+      - ./src/:/app/src/
+    entrypoint: ['sh','./entrypoint.sh']
+    command:
+      - sh
+      - -c
+      - |
+        npm run dev

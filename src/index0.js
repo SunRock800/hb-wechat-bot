@@ -56,9 +56,6 @@ async function onFriendShip(friendship) {
  * @returns {Promise<void>}
  */
 async function onMessage(msg) {
-  if (msg.self()) {
-    return
-  }
   // 默认消息回复
   await defaultMessage(msg, bot, serviceType)
   // 消息分片
@@ -72,10 +69,10 @@ export const bot = WechatyBuilder.build({
   name: 'WechatEveryDay',
   puppet: 'wechaty-puppet-whatsapp', // 如果有token，记得更换对应的puppet
   // puppet: 'wechaty-puppet-wechat', // 如果 wechaty-puppet-wechat 存在问题，也可以尝试使用上面的 wechaty-puppet-wechat4u ，记得安装 wechaty-puppet-wechat4u
-  /*puppetOptions: {
+  puppetOptions: {
     uos: true,
     ...CHROME_BIN,
-  },*/
+  },
 })
 
 // 扫码
