@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node ./cli.js",
+    "dev": "node ./src/index.js",
     "format": "prettier --write ./src",
-    "start": "node ./cli.js",
+    "start": "node ./src/index.js",
     "test": "node ./src/wechaty/testMessage.js",
     "test-openai": "node ./src/openai/__test__.js",
     "test-xunfei": "node ./src/xunfei/__test__.js",

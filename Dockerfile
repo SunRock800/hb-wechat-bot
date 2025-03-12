@@ -48,11 +48,12 @@ FROM builder
 RUN mkdir -p /app
 WORKDIR /app
 
-COPY package.json ./
-RUN npm config set registry ${NPM_REGISTRY} && npm i
+#COPY package.json ./
+RUN npm config set registry ${NPM_REGISTRY}
+# RUN npm i
 
-COPY *.js ./
+#COPY *.js ./
 # COPY src/ ./src/
-COPY .env ./
+#COPY .env ./
 
 # CMD ["npm", "run", "dev"]

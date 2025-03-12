@@ -8,6 +8,13 @@ services:
     container_name: wechat-bot
 #    restart: always
     volumes:
-      - .env:/app/.env
+      - ./entrypoint.sh:/app/entrypoint.sh
+      - ./.env:/app/.env
+      - ./package.json:/app/package.json
       - ./src/:/app/src/
-    command: ['ls','-a']
+    entrypoint: ['sh','./entrypoint.sh']
+    command:
+      - sh
+      - -c
+      - |
+        npm run dev
