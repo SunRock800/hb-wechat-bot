@@ -18,10 +18,10 @@ function setConfig(prompt) {
   return {
     method: 'post',
     url: `${url}/${action}`,
+    responseType: 'stream',
     timeout: 120000,
     headers: {
       'Content-Type': 'application/json',
-      // Accept: 'application/json',
       Authorization: `Bearer ${token}`,
     },
     data: JSON.stringify({
@@ -38,24 +38,40 @@ export async function getDifyReply(prompt) {
   try {
     const config = setConfig(prompt)
     console.log('🌸🌸🌸 / config: ', config)
-    const res = await axios.post(config)
-    let result = ''
-    const lines = res.data.split('\n').filter((line) => line.trim() !== '')
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const messageObj = line.substring(6)
-        if (messageObj === '[DONE]') break
-        const message = JSON.parse(messageObj)
-        if (message.choices && message.choices[0].delta && message.choices[0].delta.content) {
-          result += message.choices[0].delta.content
-        }
-      }
-    }
-    return result
+    const response = await axios(config)
 
-    // const response = await axios(config)
-    // console.log('🌸🌸🌸 / response: ', response)
-    // return response
+    // 使用一个 Buffer 数组来收集流式数据
+    const chunks = []
+
+    // 监听 data 事件，将接收到的数据块添加到 chunks 数组中
+    response.data.on('data', (chunk) => {
+      const strChunk = chunk.toString('utf-8')
+      if (strChunk.startsWith('data: ')) {
+        const data = strChunk.substring(6)
+        chunks.push(JSON.parse(data))
+      }
+    })
+
+    // 返回一个 Promise，当流结束时 resolve
+    return new Promise((resolve, reject) => {
+      // 监听 end 事件，当流结束时合并所有数据块并返回完整的数据
+      response.data.on('end', () => {
+        let message = ''
+        chunks.forEach((item) => {
+          if (item.event == 'message') {
+            message += item.answer
+          } else if (item.event == 'message_end') {
+            console.log('message END')
+          }
+        })
+        resolve(message)
+      })
+
+      // 监听 error 事件，以便在发生错误时处理
+      response.data.on('error', (err) => {
+        reject(err)
+      })
+    })
   } catch (error) {
     console.error(error.code)
     console.error(error.message)
