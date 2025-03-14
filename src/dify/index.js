@@ -14,8 +14,9 @@ const actions = {
 function getAction() {
   return actions[env.DIFY_ACTION]
 }
-function setConfig(prompt) {
+function setConfig(prompt, fromName) {
   const action = getAction()
+  const cid = getCid(fromName)
   return {
     method: 'post',
     url: `${url}/${action}`,
@@ -30,19 +31,23 @@ function setConfig(prompt) {
       query: prompt,
       response_mode: 'streaming',
       user: bot_name,
+      conversation_id: '' + cid,
       files: [],
     }),
   }
 }
 
+async function getCid(fromName) {
+  // 获取对话id
+  const ckey = 'dify-cid-' + fromName
+  let cid = await redis.get(ckey)
+  if (cid == null) cid = ''
+  return cid
+}
+
 export async function getDifyReply(prompt, fromName) {
   try {
     const config = setConfig(prompt, fromName)
-    // 获取对话id
-    const ckey = 'dify-cid-' + fromName
-    let cid = await redis.get(ckey)
-    console.log('🌸🌸🌸 / cid: ', cid)
-    if (cid != null) config.conversation_id = cid
 
     console.log('🌸🌸🌸 / config: ', config)
     console.log('🌸🌸🌸 / fromName: ', fromName)
