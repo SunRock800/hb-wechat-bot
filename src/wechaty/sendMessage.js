@@ -57,7 +57,7 @@ export async function defaultMessage(msg, bot, ServiceType = 'GPT') {
       const question = content.replace(`${autoReplyPrefix}`, '')
       console.log('🌸🌸🌸 / content: ', question)
       console.log('🌸🌸🌸 / isBotSelf: ', isBotSelf)
-      const response = await getReply(question)
+      const response = await getReply(question, contact.id)
       await contact.say(response)
     }
   } catch (e) {

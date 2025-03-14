@@ -1,5 +1,6 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
+import { redis } from '../redis.js'
 // 加载环境变量
 dotenv.config()
 const env = dotenv.config().parsed // 环境参数
@@ -34,10 +35,18 @@ function setConfig(prompt) {
   }
 }
 
-export async function getDifyReply(prompt) {
+export async function getDifyReply(prompt, fromName) {
   try {
-    const config = setConfig(prompt)
+    const config = setConfig(prompt, fromName)
+    // 获取对话id
+    const ckey = 'dify-cid-' + fromName
+    let cid = await redis.get(ckey)
+    console.log('🌸🌸🌸 / cid: ', cid)
+    if (cid != null) config.conversation_id = cid
+
     console.log('🌸🌸🌸 / config: ', config)
+    console.log('🌸🌸🌸 / fromName: ', fromName)
+
     const response = await axios(config)
 
     let result = ''
@@ -45,6 +54,8 @@ export async function getDifyReply(prompt) {
     for (const line of lines) {
       if (line.startsWith('data: ')) {
         const messageObj = JSON.parse(line.substring(6))
+        console.log(messageObj)
+        if (cid == null) cid = messageObj.conversation_id
         switch (messageObj.event) {
           case 'message':
             result += messageObj.answer
@@ -55,6 +66,8 @@ export async function getDifyReply(prompt) {
         }
       }
     }
+    await redis.set(ckey, cid)
+
     return result
   } catch (error) {
     console.error(error.code)

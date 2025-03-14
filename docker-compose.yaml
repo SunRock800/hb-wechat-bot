@@ -12,9 +12,24 @@ services:
       - ./.env:/app/.env
       - ./package.json:/app/package.json
       - ./src/:/app/src/
+    depends_on:
+      - redis
     entrypoint: ['sh','./entrypoint.sh']
     command:
       - sh
       - -c
       - |
         npm run dev
+
+  redis:
+    image: redis:6-alpine
+    restart: always
+    volumes:
+      # Mount the redis data directory to the container.
+      - ./volumes/redis/data:/data
+    # Set the redis password when startup redis server.
+    command: redis-server --requirepass 123456
+    ports:
+      - 6666:6379
+    healthcheck:
+      test: [ 'CMD', 'redis-cli', 'ping' ]

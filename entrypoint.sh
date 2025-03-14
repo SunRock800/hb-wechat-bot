@@ -6,4 +6,8 @@ if [ ! -f "/app/package-lock.json" ]; then
     npm install
 fi
 
+while true; do
+  sleep 60
+done
+
 exec "$@"
