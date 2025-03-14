@@ -18,7 +18,7 @@ function setConfig(prompt) {
   return {
     method: 'post',
     url: `${url}/${action}`,
-    responseType: 'stream',
+    // responseType: 'stream',
     timeout: 120000,
     headers: {
       'Content-Type': 'application/json',
@@ -40,38 +40,22 @@ export async function getDifyReply(prompt) {
     console.log('🌸🌸🌸 / config: ', config)
     const response = await axios(config)
 
-    // 使用一个 Buffer 数组来收集流式数据
-    const chunks = []
-
-    // 监听 data 事件，将接收到的数据块添加到 chunks 数组中
-    response.data.on('data', (chunk) => {
-      const strChunk = chunk.toString('utf-8')
-      if (strChunk.startsWith('data: ')) {
-        const data = strChunk.substring(6)
-        chunks.push(JSON.parse(data))
+    let result = ''
+    const lines = response.data.split('\n').filter((line) => line.trim() !== '')
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const messageObj = JSON.parse(line.substring(6))
+        switch (messageObj.event) {
+          case 'message':
+            result += messageObj.answer
+            break
+          case 'workflow_finished':
+            result = messageObj.data.outputs.answer
+            break
+        }
       }
-    })
-
-    // 返回一个 Promise，当流结束时 resolve
-    return new Promise((resolve, reject) => {
-      // 监听 end 事件，当流结束时合并所有数据块并返回完整的数据
-      response.data.on('end', () => {
-        let message = ''
-        chunks.forEach((item) => {
-          if (item.event == 'message') {
-            message += item.answer
-          } else if (item.event == 'message_end') {
-            console.log('message END')
-          }
-        })
-        resolve(message)
-      })
-
-      // 监听 error 事件，以便在发生错误时处理
-      response.data.on('error', (err) => {
-        reject(err)
-      })
-    })
+    }
+    return result
   } catch (error) {
     console.error(error.code)
     console.error(error.message)
