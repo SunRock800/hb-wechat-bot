@@ -10,3 +10,4 @@ Chromium.app
 .idea
 /.wwebjs_cache/*
 /.wwebjs_auth/*
+/volumes/*
