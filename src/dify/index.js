@@ -14,9 +14,9 @@ const actions = {
 function getAction() {
   return actions[env.DIFY_ACTION]
 }
-function setConfig(prompt, fromName) {
+async function setConfig(prompt, fromName) {
   const action = getAction()
-  const cid = getCid(fromName)
+  const cid = await getCid(fromName)
   return {
     method: 'post',
     url: `${url}/${action}`,
@@ -47,7 +47,7 @@ async function getCid(fromName) {
 
 export async function getDifyReply(prompt, fromName) {
   try {
-    const config = setConfig(prompt, fromName)
+    const config = await setConfig(prompt, fromName)
 
     console.log('🌸🌸🌸 / config: ', config)
     console.log('🌸🌸🌸 / fromName: ', fromName)
@@ -55,18 +55,23 @@ export async function getDifyReply(prompt, fromName) {
     const response = await axios(config)
 
     let result = ''
+    let cid = await getCid(fromName)
+    const ckey = 'dify-cid-' + fromName
     const lines = response.data.split('\n').filter((line) => line.trim() !== '')
     for (const line of lines) {
       if (line.startsWith('data: ')) {
         const messageObj = JSON.parse(line.substring(6))
         console.log(messageObj)
-        if (cid == null) cid = messageObj.conversation_id
+        if (cid == '') cid = messageObj.conversation_id
         switch (messageObj.event) {
           case 'message':
             result += messageObj.answer
             break
           case 'workflow_finished':
             result = messageObj.data.outputs.answer
+            break
+          case 'agent_thought':
+            result = messageObj.thought
             break
         }
       }
