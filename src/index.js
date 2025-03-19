@@ -107,6 +107,10 @@ function botStart() {
     .start()
     .then(() => console.log('Start to log in wechat...'))
     .catch((e) => console.error('❌ botStart error: ', e))
+
+	keepLive().then(()=>{
+		console.log('keep live')
+	})
 }
 
 process.on('uncaughtException', (err) => {
@@ -230,14 +234,16 @@ function init() {
 }
 
 async function keepLive(){
-	setInterval(()=>{
-		const isLogin = bot.logonoff()
-		if (isLogin) {
-		  console.log('Bot logined')
-		} else {
-		  console.log('Bot not logined')
-		}
-	},600)
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			const isLogin = bot.logonoff()
+			if(isLogin){
+				console.log('Bot logined')
+			}else{
+				console.log('Bot not logined')
+			}
+	    }, 10);
+	});
 }
 
 const program = new Command(name)
