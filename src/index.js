@@ -229,6 +229,17 @@ function init() {
   }
 }
 
+async function keepLive(){
+	setInterval(()=>{
+		const isLogin = bot.logonoff()
+		if (isLogin) {
+		  console.log('Bot logined')
+		} else {
+		  console.log('Bot not logined')
+		}
+	},600)
+}
+
 const program = new Command(name)
 program
   .alias('we')

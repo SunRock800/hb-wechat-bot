@@ -61,7 +61,7 @@ export async function getDifyReply(prompt, fromName) {
     for (const line of lines) {
       if (line.startsWith('data: ')) {
         const messageObj = JSON.parse(line.substring(6))
-        console.log(messageObj)
+        // console.log(messageObj)
         if (cid == '') cid = messageObj.conversation_id
         switch (messageObj.event) {
           case 'message':
