@@ -32,6 +32,8 @@ function onLogin(user) {
   const date = new Date()
   console.log(`Current time:${date}`)
   console.log(`Automatic robot chat mode has been activated`)
+
+	keepLive().then(()=>console.log('keep live'))
 }
 
 // 登出
@@ -107,10 +109,6 @@ function botStart() {
     .start()
     .then(() => console.log('Start to log in wechat...'))
     .catch((e) => console.error('❌ botStart error: ', e))
-
-	keepLive().then(()=>{
-		console.log('keep live')
-	})
 }
 
 process.on('uncaughtException', (err) => {
@@ -235,14 +233,15 @@ function init() {
 
 async function keepLive(){
 	return new Promise((resolve, reject) => {
-		setTimeout(() => {
-			const isLogin = bot.logonoff()
+		setInterval(() => {
+			const isLogin = bot.isLoggedIn
 			if(isLogin){
 				console.log('Bot logined')
 			}else{
 				console.log('Bot not logined')
+				botStart()
 			}
-	    }, 10);
+	    }, 600000);
 	});
 }
 
