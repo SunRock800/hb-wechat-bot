@@ -1,6 +1,7 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
-import { redis } from '../redis.js'
+import { customer } from '../customer.js'
+
 // 加载环境变量
 dotenv.config()
 const env = dotenv.config().parsed // 环境参数
@@ -16,7 +17,7 @@ function getAction() {
 }
 async function setConfig(prompt, fromName) {
   const action = getAction()
-  const cid = await getCid(fromName)
+  const customerObj = await customer.getCustomer(fromName)
   return {
     method: 'post',
     url: `${url}/${action}`,
@@ -31,22 +32,17 @@ async function setConfig(prompt, fromName) {
       query: prompt,
       response_mode: 'streaming',
       user: bot_name,
-      conversation_id: '' + cid,
+      conversation_id: '' + customerObj.conversation,
       files: [],
     }),
   }
 }
 
-async function getCid(fromName) {
-  // 获取对话id
-  const ckey = 'dify-cid-' + fromName
-  let cid = await redis.get(ckey)
-  if (cid == null) cid = ''
-  return cid
-}
-
 export async function getDifyReply(prompt, fromName) {
   try {
+    // 保留用户消息
+    customer.chatRecord(fromName, 1, prompt)
+
     const config = await setConfig(prompt, fromName)
 
     console.log('🌸🌸🌸 / config: ', config)
@@ -55,14 +51,13 @@ export async function getDifyReply(prompt, fromName) {
     const response = await axios(config)
 
     let result = ''
-    let cid = await getCid(fromName)
-    const ckey = 'dify-cid-' + fromName
+    let customerObj = await customer.getCustomer(fromName)
     const lines = response.data.split('\n').filter((line) => line.trim() !== '')
     for (const line of lines) {
       if (line.startsWith('data: ')) {
         const messageObj = JSON.parse(line.substring(6))
         // console.log(messageObj)
-        if (cid == '') cid = messageObj.conversation_id
+        if (customerObj.conversation == '') customerObj.conversation = messageObj.conversation_id
         switch (messageObj.event) {
           case 'message':
             result += messageObj.answer
@@ -76,7 +71,12 @@ export async function getDifyReply(prompt, fromName) {
         }
       }
     }
-    await redis.set(ckey, cid)
+
+    // 保留回复消息
+    customer.chatRecord(fromName, 0, result)
+
+    // 客户信息缓存
+    await customer.setCustomer(fromName, customerObj.conversation, customerObj.customerId)
 
     return result
   } catch (error) {

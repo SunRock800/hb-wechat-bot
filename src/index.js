@@ -33,7 +33,7 @@ function onLogin(user) {
   console.log(`Current time:${date}`)
   console.log(`Automatic robot chat mode has been activated`)
 
-	keepLive().then(()=>console.log('keep live'))
+  // keepLive().then(()=>console.log('keep live'))
 }
 
 // 登出
@@ -231,18 +231,19 @@ function init() {
   }
 }
 
-async function keepLive(){
-	return new Promise((resolve, reject) => {
-		setInterval(() => {
-			const isLogin = bot.isLoggedIn
-			if(isLogin){
-				console.log('Bot logined')
-			}else{
-				console.log('Bot not logined')
-				botStart()
-			}
-	    }, 600000);
-	});
+async function keepLive() {
+  return new Promise((resolve, reject) => {
+    setInterval(() => {
+      const isLogin = bot.isLoggedIn
+      if (isLogin) {
+        console.log('Bot logined')
+        bot.say('Bot logined')
+      } else {
+        console.log('Bot not logined')
+        botStart()
+      }
+    }, 5000)
+  })
 }
 
 const program = new Command(name)

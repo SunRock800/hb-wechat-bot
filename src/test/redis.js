@@ -1,28 +1,11 @@
-let promiseTemp = null
-let promiseResolve = null
-function loginFinish() {
-  return promiseTemp
-}
+import { redis } from '../redis.js'
+const value = { cid: '123', customerId: '321' }
+redis.set('test', JSON.stringify(value))
+// redis.set('test', '123')
 
-async function func1() {
-  let temp = new Promise((res, rej) => {
-    setTimeout(() => {
-      console.log('第三')
-      promiseResolve('我执行完了，轮到第四了')
-    }, 2000)
-  })
+const valueStr = await redis.get('test')
+const valueObj = JSON.parse(valueStr)
+console.log(valueObj)
+console.log(typeof valueObj)
 
-  promiseTemp = new Promise((resolve) => (promiseResolve = resolve))
-  let a = await loginFinish()
-  console.log(a)
-}
-function func2() {
-  console.log('第二')
-  func1()
-}
-function func3() {
-  console.log('第一')
-  func2()
-  console.log('第四')
-}
-func3()
+redis.disconnect()
