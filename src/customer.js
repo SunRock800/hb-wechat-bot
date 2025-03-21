@@ -11,6 +11,7 @@ async function getCustomer(account) {
   const key = getKey(account)
   let customer = JSON.parse(await redis.get(key))
   if (customer == null) customer = { conversation: '', customerId: '' }
+  if (customer.customerId === '' || customer.customerId == null) customer = await setCustomer(account, customer.conversation, customer.customerId)
   return customer
 }
 
@@ -19,6 +20,7 @@ async function setCustomer(account, conversation = '', customerId = '') {
   if (!customerId || customerId === '' || customerId == null) customerId = await createCustomer(account)
   const customer = { conversation: conversation, customerId: customerId }
   redis.set(key, JSON.stringify(customer))
+  return customer
 }
 
 function createCustomer(account) {
@@ -61,6 +63,7 @@ function createCustomer(account) {
 
 async function chatRecord(account, sender, message) {
   const customer = await getCustomer(account)
+  console.log('chat record customer:', customer)
   const config = {
     method: 'post',
     url: 'http://118.190.210.196:8899/api/chatRecord/insert',
@@ -80,6 +83,7 @@ async function chatRecord(account, sender, message) {
       ],
     }),
   }
+  console.log('chat record config:', config)
 
   return axios(config)
     .then((response) => {
