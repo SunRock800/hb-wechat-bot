@@ -9,8 +9,13 @@ function getKey(account) {
 async function getCustomer(account) {
   // 获取对话id
   const key = getKey(account)
-  let customer = JSON.parse(await redis.get(key))
-  if (customer == null) customer = { conversation: '', customerId: '' }
+  const customerCache = await redis.get(key)
+  let customer = { conversation: '', customerId: '' }
+  if (typeof customerCache == 'object') {
+    let customer = JSON.parse(customerCache)
+  } else if (typeof customerCache == 'string') {
+    let customer = { conversation: customerCache, customerId: '' }
+  }
   if (customer.customerId === '' || customer.customerId == null) customer = await setCustomer(account, customer.conversation, customer.customerId)
   return customer
 }
