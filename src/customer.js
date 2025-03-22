@@ -10,22 +10,25 @@ async function getCustomer(account) {
   // 获取对话id
   const key = getKey(account)
   const customerCache = await redis.get(key)
-  let customer = { conversation: '', customerId: '' }
-  if (typeof customerCache == 'object') {
-    let customer = JSON.parse(customerCache)
-  } else if (typeof customerCache == 'string') {
-    let customer = { conversation: customerCache, customerId: '' }
+  let customerObj = { conversation: '', customerId: '' }
+  if (customerCache != null) {
+    try {
+      customerObj = JSON.parse(customerCache)
+    } catch (e) {
+      customerObj = { conversation: customerCache, customerId: '' }
+    }
   }
-  if (customer.customerId === '' || customer.customerId == null) customer = await setCustomer(account, customer.conversation, customer.customerId)
-  return customer
+  if (customerObj.customerId === '' || customerObj.customerId == null)
+    customerObj = await setCustomer(account, customerObj.conversation, customerObj.customerId)
+  return customerObj
 }
 
 async function setCustomer(account, conversation = '', customerId = '') {
   const key = getKey(account)
   if (!customerId || customerId === '' || customerId == null) customerId = await createCustomer(account)
-  const customer = { conversation: conversation, customerId: customerId }
-  redis.set(key, JSON.stringify(customer))
-  return customer
+  const customerObj = { conversation: conversation, customerId: customerId }
+  redis.set(key, JSON.stringify(customerObj))
+  return customerObj
 }
 
 function createCustomer(account) {
@@ -67,8 +70,8 @@ function createCustomer(account) {
 }
 
 async function chatRecord(account, sender, message) {
-  const customer = await getCustomer(account)
-  console.log('chat record customer:', customer)
+  const customerObj = await getCustomer(account)
+  console.log('chat record customer:', customerObj)
   const config = {
     method: 'post',
     url: 'http://118.190.210.196:8899/api/chatRecord/insert',
@@ -77,7 +80,7 @@ async function chatRecord(account, sender, message) {
       'Content-Type': 'application/json',
     },
     data: JSON.stringify({
-      customerId: customer.customerId, //必传，先保存客户信息返回值
+      customerId: customerObj.customerId, //必传，先保存客户信息返回值
       messageList: [
         //信息内容
         {
