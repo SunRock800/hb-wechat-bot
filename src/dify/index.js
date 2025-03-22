@@ -31,7 +31,7 @@ async function setConfig(prompt, fromName) {
       inputs: {},
       query: prompt,
       response_mode: 'streaming',
-      user: bot_name,
+      user: fromName,
       conversation_id: '' + customerObj.conversation,
       files: [],
     }),
