@@ -33,7 +33,7 @@ function onLogin(user) {
   console.log(`Current time:${date}`)
   console.log(`Automatic robot chat mode has been activated`)
 
-  // keepLive().then(()=>console.log('keep live'))
+  keepLive().then(() => console.log('keep live'))
 }
 
 // 登出
@@ -242,7 +242,7 @@ async function keepLive() {
         console.log('Bot not logined')
         botStart()
       }
-    }, 5000)
+    }, 3600000)
   })
 }
 
