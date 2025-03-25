@@ -41,7 +41,11 @@ async function setConfig(prompt, fromName) {
 export async function getDifyReply(prompt, fromName) {
   try {
     // 保留用户消息
-    customer.chatRecord(fromName, 1, prompt)
+    if (prompt != '') {
+      customer.chatRecord(fromName, 1, prompt)
+    } else {
+      prompt = ' '
+    }
 
     const config = await setConfig(prompt, fromName)
 
