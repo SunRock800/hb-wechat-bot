@@ -40,3 +40,7 @@ User: 我满意的 Product_category 是 Car Carrier Semi Trailer Assistant: 您�
 ### Example 4
 
 User: 我满意的 Product_category 是 HOWO truck/HOWO dump truck Assistant: 您意向左舵还是右舵 User: 左舵/右舵 Assistant: 在哪个国家或者港口使用? User: 中国 Assistant: 我已经了解了您的基本需求，我们的销售人员会在稍后联系您，并给您详细的报价
+
+### Example 5
+
+User: Assistant: 请您发送纯文字信息
