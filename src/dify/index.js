@@ -12,9 +12,11 @@ const actions = {
   chat: 'chat-messages',
   work: 'workflow/run',
 }
+
 function getAction() {
   return actions[env.DIFY_ACTION]
 }
+
 async function setConfig(prompt, fromName) {
   const action = getAction()
   const customerObj = await customer.getCustomer(fromName)
@@ -40,13 +42,6 @@ async function setConfig(prompt, fromName) {
 
 export async function getDifyReply(prompt, fromName) {
   try {
-    // 保留用户消息
-    if (prompt != '') {
-      customer.chatRecord(fromName, 1, prompt)
-    } else {
-      prompt = ' '
-    }
-
     const config = await setConfig(prompt, fromName)
 
     console.log('🌸🌸🌸 / config: ', config)
@@ -76,13 +71,17 @@ export async function getDifyReply(prompt, fromName) {
       }
     }
 
+    const resultObj = JSON.parse(result)
+
     // 保留回复消息
-    customer.chatRecord(fromName, 0, result)
+    if (resultObj.product != '') {
+      customer.chatRecord(fromName, 0, result)
+    }
 
     // 客户信息缓存
     await customer.setCustomer(fromName, customerObj.conversation, customerObj.customerId)
 
-    return result
+    return resultObj.message
   } catch (error) {
     console.error(error.code)
     console.error(error.message)
