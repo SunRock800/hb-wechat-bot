@@ -40,9 +40,12 @@ User: 我满意的 Product_category 是 Fuel Tanker Semi-Trailer Assistant: 您�
 
 ### Example 2
 
-User: 我满意的 Product_category 是 Flatbed Semi-Trailer/Low Bed Semi-Trailer/Dump Semi-Trailer/Removable Gooseneck
-Trailer Assistant: 您想用来运输什么货物? User: 衣服 Assistant: 在哪个国家或者港口使用? User: 中国 Assistant:
-我已经了解了您的基本需求，我们的销售人员会在稍后联系您，并给您详细的报价
+User: 我满意的 Product_category 是 Flatbed Semi-Trailer/Low Bed Semi-Trailer/Dump Semi-Trailer/Removable Gooseneck Trailer
+Assistant: 您想用来运输什么货物?
+User: 衣服
+Assistant: 在哪个国家或者港口使用?
+User: 中国
+Assistant:我已经了解了您的基本需求，我们的销售人员会在稍后联系您，并给您详细的报价
 
 ### Example 3
 
