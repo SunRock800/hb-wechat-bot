@@ -32,7 +32,7 @@ async function setCustomer(account, conversation = '', customerId = '') {
   return customerObj
 }
 
-function createCustomer(account, is_customer = false, language = '', targetProduct = '') {
+function createCustomer(account, valid = 0, language = '', targetProduct = '', area = '') {
   if (targetProduct == '') targetProduct = '暂无'
   const config = {
     method: 'post',
@@ -48,7 +48,8 @@ function createCustomer(account, is_customer = false, language = '', targetProdu
       source: '1', //默认值：1
       targetProduct: targetProduct,
       whatsapp: account, //必填
-      // areaSource: "中国",			//地区
+      areaSource: area, //地区
+      valid: valid,
     }),
   }
 

@@ -45,6 +45,9 @@ async function setConfig(prompt, fromName) {
 
 export async function getDifyReply(prompt, fromName) {
   try {
+    // 保留用户消息
+    if (prompt == '') prompt = ' '
+
     const config = await setConfig(prompt, fromName)
 
     console.log('🌸🌸🌸 / config: ', config)
@@ -77,7 +80,7 @@ export async function getDifyReply(prompt, fromName) {
     const resultObj = JSON.parse(result)
     console.log('🌸🌸🌸 / resultObj:', resultObj)
     if (resultObj.is_customer === 'True' || resultObj.is_customer === 'true' || resultObj.is_customer === true) {
-      await customer.createCustomer(fromName, true, resultObj.language, resultObj.product)
+      await customer.createCustomer(fromName, 1, resultObj.language, resultObj.product, resultObj.country)
     }
 
     // 保留回复消息
