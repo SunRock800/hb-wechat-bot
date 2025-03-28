@@ -1,6 +1,9 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
 import { customer } from '../customer.js'
+import moment from 'moment/moment.js'
+import { createClient } from 'redis'
+import { is_buffer } from 'openai/internal/qs/utils'
 
 // 加载环境变量
 dotenv.config()
@@ -72,11 +75,26 @@ export async function getDifyReply(prompt, fromName) {
     }
 
     const resultObj = JSON.parse(result)
+    console.log('🌸🌸🌸 / resultObj:', resultObj)
+    if (resultObj.is_customer === 'True' || resultObj.is_customer === 'true' || resultObj.is_customer === true) {
+      await customer.createCustomer(fromName, true, resultObj.language, resultObj.product)
+    }
 
     // 保留回复消息
-    if (resultObj.product != '') {
-      customer.chatRecord(fromName, 0, result)
-    }
+    const sendTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+    const messages = [
+      {
+        sender: 1, //0: AI自动回复信息，1：客户发送的聊天信息
+        message: prompt,
+        sendTime: sendTime, //yyyy-MM-dd HH:mm:ss或者时间戳，统一即可
+      },
+      {
+        sender: 0, //0: AI自动回复信息，1：客户发送的聊天信息
+        message: resultObj.message,
+        sendTime: sendTime, //yyyy-MM-dd HH:mm:ss或者时间戳，统一即可
+      },
+    ]
+    await customer.chatRecord(fromName, messages)
 
     // 客户信息缓存
     await customer.setCustomer(fromName, customerObj.conversation, customerObj.customerId)
