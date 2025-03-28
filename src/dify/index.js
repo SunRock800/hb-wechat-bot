@@ -77,10 +77,11 @@ export async function getDifyReply(prompt, fromName) {
       }
     }
 
+    console.log('🌸🌸🌸 / result:', result)
     const resultObj = JSON.parse(result)
     console.log('🌸🌸🌸 / resultObj:', resultObj)
     if (resultObj.is_customer === 'True' || resultObj.is_customer === 'true' || resultObj.is_customer === true) {
-      await customer.createCustomer(fromName, 1, resultObj.language, resultObj.product, resultObj.country)
+      customer.createCustomer(fromName, 1, resultObj.language, resultObj.product, resultObj.country)
     }
 
     // 保留回复消息
@@ -97,7 +98,7 @@ export async function getDifyReply(prompt, fromName) {
         sendTime: sendTime, //yyyy-MM-dd HH:mm:ss或者时间戳，统一即可
       },
     ]
-    await customer.chatRecord(fromName, messages)
+    customer.chatRecord(fromName, messages)
 
     // 客户信息缓存
     await customer.setCustomer(fromName, customerObj.conversation, customerObj.customerId)
