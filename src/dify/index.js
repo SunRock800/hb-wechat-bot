@@ -1,6 +1,9 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
 import { customer } from '../customer.js'
+import moment from 'moment/moment.js'
+import { createClient } from 'redis'
+import { is_buffer } from 'openai/internal/qs/utils'
 
 // 加载环境变量
 dotenv.config()
@@ -12,9 +15,11 @@ const actions = {
   chat: 'chat-messages',
   work: 'workflow/run',
 }
+
 function getAction() {
   return actions[env.DIFY_ACTION]
 }
+
 async function setConfig(prompt, fromName) {
   const action = getAction()
   const customerObj = await customer.getCustomer(fromName)
@@ -41,11 +46,7 @@ async function setConfig(prompt, fromName) {
 export async function getDifyReply(prompt, fromName) {
   try {
     // 保留用户消息
-    if (prompt != '') {
-      customer.chatRecord(fromName, 1, prompt)
-    } else {
-      prompt = ' '
-    }
+    if (prompt == '') prompt = ' '
 
     const config = await setConfig(prompt, fromName)
 
@@ -76,13 +77,32 @@ export async function getDifyReply(prompt, fromName) {
       }
     }
 
+    const resultObj = JSON.parse(result)
+    console.log('🌸🌸🌸 / resultObj:', resultObj)
+    if (resultObj.is_customer === 'True' || resultObj.is_customer === 'true' || resultObj.is_customer === true) {
+      await customer.createCustomer(fromName, 1, resultObj.language, resultObj.product, resultObj.country)
+    }
+
     // 保留回复消息
-    customer.chatRecord(fromName, 0, result)
+    const sendTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+    const messages = [
+      {
+        sender: 1, //0: AI自动回复信息，1：客户发送的聊天信息
+        message: prompt,
+        sendTime: sendTime, //yyyy-MM-dd HH:mm:ss或者时间戳，统一即可
+      },
+      {
+        sender: 0, //0: AI自动回复信息，1：客户发送的聊天信息
+        message: resultObj.message,
+        sendTime: sendTime, //yyyy-MM-dd HH:mm:ss或者时间戳，统一即可
+      },
+    ]
+    await customer.chatRecord(fromName, messages)
 
     // 客户信息缓存
     await customer.setCustomer(fromName, customerObj.conversation, customerObj.customerId)
 
-    return result
+    return resultObj.message
   } catch (error) {
     console.error(error.code)
     console.error(error.message)
